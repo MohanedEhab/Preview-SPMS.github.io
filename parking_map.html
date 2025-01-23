@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Bakisena - Parking Map</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <!-- Add Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Original Stylesheets -->
+  <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/open-iconic-bootstrap.min.css">
+  <link rel="stylesheet" href="css/animate.css">
+  <link rel="stylesheet" href="css/owl.carousel.min.css">
+  <link rel="stylesheet" href="css/owl.theme.default.min.css">
+  <link rel="stylesheet" href="css/magnific-popup.css">
+  <link rel="stylesheet" href="css/aos.css">
+  <link rel="stylesheet" href="css/ionicons.min.css">
+  <link rel="stylesheet" href="css/bootstrap-datepicker.css">
+  <link rel="stylesheet" href="css/jquery.timepicker.css">
+  <link rel="stylesheet" href="css/flaticon.css">
+  <link rel="stylesheet" href="css/icomoon.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="Bakisenalogo.png">
+
+  <style>
+    :root {
+      --available: #2ecc71;
+      --occupied: #e74c3c;
+      --handicap: #3498db;
+      --structure: #2c3e50;
+      --lane-color: #95a5a6;
+    }
+
+    .garage-container {
+      background-color: var(--structure);
+      padding: 30px;
+      border-radius: 15px;
+      margin: 20px 0;
+      position: relative;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .garage-level {
+      background-color: #34495e;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .garage-level.active {
+      display: block;
+    }
+
+    .level-title {
+      color: white;
+      margin-bottom: 15px;
+      padding: 10px;
+      background-color: #2c3e50;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 1.2em;
+    }
+
+    .parking-row {
+      display: flex;
+      justify-content: center;
+      margin: 15px 0;
+      position: relative;
+      gap: 10px;
+    }
+
+    .driving-lane {
+      height: 60px;
+      background: var(--lane-color);
+      margin: 20px 0;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .lane-arrow {
+      color: white;
+      font-size: 24px;
+      animation: flow 2s infinite linear;
+    }
+
+    @keyframes flow {
+      0% {
+        opacity: 0;
+        transform: translateX(-100%);
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateX(100%);
+      }
+    }
+
+    .parking-spot {
+      width: 60px;
+      height: 100px;
+      margin: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.9em;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .parking-spot:hover {
+      transform: scale(1.05);
+      z-index: 2;
+    }
+
+    .available {
+      background-color: var(--available);
+    }
+
+    .occupied {
+      background-color: var(--occupied);
+    }
+
+    .handicap {
+      background-color: var(--handicap);
+    }
+
+    .handicap::after {
+      content: '♿';
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 14px;
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+    }
+
+    .entrance {
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #e67e22;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+    }
+
+    .exit {
+      position: absolute;
+      left: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: #e67e22;
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+    }
+
+    .exit {
+      left: -70px;
+    }
+
+    .entrance {
+      right: -70px;
+    }
+
+    .stats-card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Original Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
+    <div class="container">
+      <a class="navbar-brand" href="index.php" class="logo">
+        <img src="images\Bakisena.png" alt="Logo" style="height: 85px;">
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="oi oi-menu"></span> Menu
+      </button>
+
+      <div class="collapse navbar-collapse" id="ftco-nav">
+        <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+          <li class="nav-item"><a href="students.html" class="nav-link">Student Dashboard</a></li>
+          <li class="nav-item"><a href="admin.html" class="nav-link">Admin Dashboard</a></li>
+              <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+              <li class="nav-item"><a href="pricing.html" class="nav-link">Prices</a></li>
+              <li class="nav-item"><a href="contact.html" class="nav-link">Contact Us</a></li>
+              <li class="nav-item"><a href="login.html" class="nav-link">Login page</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero-wrap hero-wrap-2 js-fullheight" style="background-image: url('images/ContactUs.jpg');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row no-gutters slider-text js-fullheight align-items-end justify-content-start">
+        <div class="col-md-9 ftco-animate pb-5">
+          <p class="breadcrumbs"><span class="mr-2"><a href="index.php">Home <i class="ion-ios-arrow-forward"></i></a></span> <span>Parking Map <i class="ion-ios-arrow-forward"></i></span></p>
+          <h1 class="mb-3 bread">Live Parking Map</h1>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="ftco-section">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-12 text-center mb-5">
+          <h2 class="heading-section">Garage Parking Map</h2>
+          <div class="floor-selector">
+            <button class="btn btn-primary active" onclick="showFloor('G')">Ground Floor</button>
+            <button class="btn btn-primary" onclick="showFloor('B1')">Basement 1</button>
+            <button class="btn btn-primary" onclick="showFloor('F1')">Floor 1</button>
+          </div>
+          <div class="legend">
+            <div class="d-inline-block mx-3">
+              <span class="legend-color available" style="background: var(--available)"></span> Available
+            </div>
+            <div class="d-inline-block mx-3">
+              <span class="legend-color occupied" style="background: var(--occupied)"></span> Occupied
+            </div>
+            <div class="d-inline-block mx-3">
+              <span style="color: var(--handicap)">♿</span> Handicap Accessible
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Parking Map Container -->
+      <div class="garage-container">
+        <div class="exit">EXIT</div>
+        <div class="entrance">ENTRANCE</div>
+
+        <!-- Ground Floor -->
+        <div class="garage-level active" id="G">
+          <div class="level-title">Ground Floor</div>
+
+          <div class="driving-lane">
+            <div class="lane-arrow"><i class="fas fa-arrow-right"></i></div>
+            <div class="lane-arrow"><i class="fas fa-arrow-right"></i></div>
+          </div>
+
+          <div class="parking-row">
+            <div class="parking-spot available handicap">A1</div>
+            <div class="parking-spot occupied">A2</div>
+            <div class="pillar"></div>
+            <div class="parking-spot available">A3</div>
+            <div class="parking-spot occupied">A4</div>
+            <div class="pillar"></div>
+            <div class="parking-spot available">A5</div>
+          </div>
+
+          <div class="driving-lane">
+            <div class="lane-arrow"><i class="fas fa-arrow-left"></i></div>
+            <div class="lane-arrow"><i class="fas fa-arrow-left"></i></div>
+          </div>
+
+          <div class="parking-row">
+            <div class="parking-spot occupied">B1</div>
+            <div class="parking-spot available">B2</div>
+            <div class="pillar"></div>
+            <div class="parking-spot occupied">B3</div>
+            <div class="parking-spot available">B4</div>
+            <div class="pillar"></div>
+            <div class="parking-spot occupied">B5</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Card -->
+      <div class="row justify-content-center mt-5">
+        <div class="col-md-8 text-center">
+          <div class="stats-card">
+            <h3>Real-time Occupancy</h3>
+            <div class="row">
+              <div class="col-md-3 mb-3">
+                <div class="text-success h4" id="availableCount">8</div>
+                <small>Available</small>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="text-danger h4" id="occupiedCount">7</div>
+                <small>Occupied</small>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="text-primary h4" id="handicapCount">2</div>
+                <small>Handicap</small>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="text-muted h4" id="totalCount">15</div>
+                <small>Total</small>
+              </div>
+            </div>
+            <p class="text-muted mb-0">Last Updated: <span id="lastUpdated"></span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Reservation Modal -->
+  <div class="modal fade" id="reservationModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Parking Spot Details</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Spot Number:</strong> <span id="modalSpotNumber"></span></p>
+          <p><strong>Status:</strong> <span id="modalSpotStatus"></span></p>
+          <p><strong>Type:</strong> <span id="modalSpotType"></span></p>
+          <button class="btn btn-primary btn-block mt-3" onclick="reserveSpot()">Reserve Spot</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Original Footer -->
+  <footer class="ftco-footer ftco-bg-dark ftco-section">
+    <!-- ... (keep your original footer content) ... -->
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/jquery.min.js"></script>
+  <script src="js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery.easing.1.3.js"></script>
+  <script src="js/jquery.waypoints.min.js"></script>
+  <script src="js/jquery.stellar.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.magnific-popup.min.js"></script>
+  <script src="js/aos.js"></script>
+  <script src="js/jquery.animateNumber.min.js"></script>
+  <script src="js/bootstrap-datepicker.js"></script>
+  <script src="js/jquery.timepicker.min.js"></script>
+  <script src="js/scrollax.min.js"></script>
+  <script src="js/main.js"></script>
+
+  <!-- Enhanced JavaScript -->
+  <script>
+    // Parking System Functions
+    function updateParkingData() {
+      const spots = document.querySelectorAll('.parking-spot');
+      let available = 0,
+        occupied = 0,
+        handicap = 0;
+
+      spots.forEach(spot => {
+        if (spot.classList.contains('available')) available++;
+        if (spot.classList.contains('occupied')) occupied++;
+        if (spot.classList.contains('handicap')) handicap++;
+      });
+
+      document.getElementById('availableCount').textContent = available;
+      document.getElementById('occupiedCount').textContent = occupied;
+      document.getElementById('handicapCount').textContent = handicap;
+      document.getElementById('totalCount').textContent = spots.length;
+      document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+    }
+
+    // Floor Switching
+    function showFloor(floorId) {
+      document.querySelectorAll('.garage-level').forEach(floor => floor.classList.remove('active'));
+      document.querySelectorAll('.floor-selector button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(floorId).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // Spot Interactions
+    document.querySelectorAll('.parking-spot').forEach(spot => {
+      spot.addEventListener('click', function() {
+        $('#reservationModal').modal('show');
+        document.getElementById('modalSpotNumber').textContent = this.textContent;
+        document.getElementById('modalSpotStatus').textContent =
+          this.classList.contains('available') ? 'Available' : 'Occupied';
+        document.getElementById('modalSpotType').textContent =
+          this.classList.contains('handicap') ? 'Handicap' : 'Regular';
+      });
+    });
+
+    // Reservation System
+    function reserveSpot() {
+      const spotNumber = document.getElementById('modalSpotNumber').textContent;
+      const spot = Array.from(document.querySelectorAll('.parking-spot'))
+        .find(s => s.textContent === spotNumber);
+
+      if (spot && spot.classList.contains('available')) {
+        spot.classList.replace('available', 'occupied');
+        updateParkingData();
+        $('#reservationModal').modal('hide');
+        alert(`Spot ${spotNumber} reserved successfully!`);
+      } else {
+        alert('This spot is no longer available');
+      }
+    }
+
+    // Simulate Real-time Updates
+    setInterval(() => {
+      const spots = document.querySelectorAll('.parking-spot:not(.handicap)');
+      const randomSpot = spots[Math.floor(Math.random() * spots.length)];
+      if (randomSpot) {
+        randomSpot.classList.toggle('available');
+        randomSpot.classList.toggle('occupied');
+        updateParkingData();
+      }
+    }, 5000);
+
+    // Initial Setup
+    $(document).ready(() => {
+      updateParkingData();
+    });
+  </script>
+</body>
+
+</html>
